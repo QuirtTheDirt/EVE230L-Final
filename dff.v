@@ -1,20 +1,18 @@
 module dff(
-    input Default,
     input D,
     input clk,
-    input reset,
-    output reg Q
+    input rst,
+    output reg Q,
+    output Qn
 );
 
-    initial begin
-        Q <= Default;
-    end
-
-    always @(posedge clk, posedge reset) begin
-        if (reset)
-            Q <= Default;
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            Q <= 1'b0;
         else
             Q <= D;
     end
+
+    assign Qn = ~Q;
 
 endmodule
