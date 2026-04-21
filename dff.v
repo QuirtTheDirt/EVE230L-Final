@@ -1,26 +1,20 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 04/21/2026 04:49:06 PM
-// Design Name: 
-// Module Name: dff
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
 module dff(
+    input Default,
+    input D,
+    input clk,
+    input reset,
+    output reg Q
+);
 
-    );
+    initial begin
+        Q <= Default;
+    end
+
+    always @(posedge clk, posedge reset) begin
+        if (reset)
+            Q <= Default;
+        else
+            Q <= D;
+    end
+
 endmodule
