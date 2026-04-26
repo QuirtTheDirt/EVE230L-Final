@@ -29,14 +29,17 @@ initial begin
 `endif
 end
 
-//Seven Segment Display Interface
-seven_segment_inf seven_segment_inf_inst (.clk(clk), .rst(btnC), .count(count) , .anode(an), .segs(seg));
-/********************************/
+
 
 /******** UNCOMMENT & UPDATE THIS SECTION ********/
 //wire "count" feeds in count value to seven segment display. This should be a 6-bit value
 //This will decide if seven segment display shows stopwatch count or timer count
-//wire [5:0] count = ;
+wire [5:0] count;
+
+
+//Seven Segment Display Interface
+seven_segment_inf seven_segment_inf_inst (.clk(clk), .rst(btnC), .count(count) , .anode(an), .segs(seg));
+/********************************/
 
 /******** UPDATE THIS SECTION ********/
 /******* INITIALIZE STOPWATCH AND TIMER MODULE ***********/
@@ -45,13 +48,37 @@ wire mode   = sw[0];        // 0 = stopwatch, 1= timer
 wire run    = sw[1];        // 0 = pause (circuit holds it state), 1 = run (counter increments/decrements)
 wire load   = sw[2];        // 1 = load value from load_value into timer counter, 0 = do nothing
 wire [5:0] load_value = sw[15:10];      //Set Timer Value (Value to load in timer)
+wire [5:0] stopwatch_cnt;
+wire [5:0] timer_count;
+wire stopwatchEn = (~mode) & run;
+wire timerEn = mode & run;
+assign count = mode ? timer_count : stopwatch_cnt;
+
+
+assign led[8:3] = stopwatch_cnt;
+assign led[15:10] = timer_count;
+assign led[2:0] = 3'b000;
+assign led[9] = 1'b0;
 
 //Stopwatch Module Instance
-//Use "clk_1Hz" as clock signal to stopwatch and timer modules
+stopwatch stopwatch_inst (
+    .clk(clk_1Hz),
+    .rst(btnC),
+    .en(stopwatchEn),
+    .state(stopwatch_cnt)
+);
 
 
 //Timer Module Instance
 //Use "clk_1Hz" as clock signal to stopwatch and timer modules
+timer timer_inst (
+    .clk(clk_1Hz),
+    .rst(btnC),
+    .en(timerEn),
+    .load(load),
+    .load_value(load_value),
+    .state(timer_count)
+    );
 
 
 endmodule

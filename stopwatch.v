@@ -5,41 +5,42 @@ module stopwatch(
     input en,
     output [5:0] state     //6-bits to represent the highest number 59
 );
-
-wire is_fiftynine = 6'b111011;
+wire is_fiftynine;
+assign is_fiftynine = (state == 6'd59);
 //state[5] & state[4] & state[3] & ~state[2] & state[1] & state[0]
  reg D0, D1, D2, D3, D4, D5;
  wire Q0, Q1, Q2, Q3, Q4, Q5;
-    always @(posedge clk or posedge en) begin
+ assign state[5:0] = {Q5,Q4,Q3,Q2,Q1,Q0};
+   always @(*) begin
     
-    state[5:0] = {Q5,Q4,Q3,Q2,Q1,Q0};
-        if (~en) {
-            D0 <= D0;
-            D1 <= D1;
-            D2 <= D2;
-            D3 <= D3;
-            D4 <= D4;
-            D5 <= D5;
-            }
+
+        if (~en) begin
+            D0 = Q0;
+            D1 = Q1;
+            D2 = Q2;
+            D3 = Q3;
+            D4 = Q4;
+            D5 = Q5;
+         end
+         
+        else if (is_fiftynine) begin
+            D0 = 1'b0;
+            D1 = 1'b0;
+            D2 = 1'b0;
+            D3 = 1'b0;
+            D4 = 1'b0;
+            D5 = 1'b0;
+        end         
             
-        else
-            D0 <= ~Q0; 
-            D1 <= Q1 ^ Q0;
-            D2 <= Q2 ^ (Q0 & Q1);
-            D3 <= Q3 ^ (Q0 & Q1 & Q2);
-            D4 <= Q4 ^ (Q0 & Q1 & Q2 & Q3);
-            D5 <= Q5 ^ (Q0 & Q1 & Q2 & Q3 ^ Q4);
-            
-        if (state = is_fiftynine){
-            D0 <= 1'b0;
-            D1 <= 1'b0;
-            D2 <= 1'b0;
-            D3 <= 1'b0;
-            D4 <= 1'b0;
-            D5 <= 1'b0;
-            }
-            
-            
+        else begin
+            D0 = ~Q0; 
+            D1 = Q1 ^ Q0;
+            D2 = Q2 ^ (Q0 & Q1);
+            D3 = Q3 ^ (Q0 & Q1 & Q2);
+            D4 = Q4 ^ (Q0 & Q1 & Q2 & Q3);
+            D5 = Q5 ^ (Q0 & Q1 & Q2 & Q3 & Q4);
+        end
+              
     end
 
     dff dff0 (
